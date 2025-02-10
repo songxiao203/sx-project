@@ -1,0 +1,251 @@
+setwd("F:/AP")
+library(vegan)
+Species <- read.table('MGS.txt', header=T,row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+Species=t(Species)
+sp <- specaccum(Species, method = 'random')
+plot(sp, ci.type = 'poly', col = 'blue', lwd = 2, ci.lty = 0, ci.col = 'lightblue')
+boxplot(sp, col = 'yellow', add = TRUE, pch = '+')
+
+#############物种累计曲线============================================
+Species <- read.table('MGS.txt', header=T,row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+label<-factor(c(rep(0,4),rep(1,4),rep(2,4),rep(3,5),rep(4,5),rep(5,4),rep(6,4)),levels=c("0","1","2","3","4","5","6"),labels=c("CON","A_MAP","R_MAP","A_MSAP","R_MSAP","A_SAP","R_SAP"))
+names(label)<-colnames(Species)
+level<-levels(label)
+ind1<-which(label==level[1])
+ind2<-which(label==level[2])
+ind3<-which(label==level[3])
+ind4<-which(label==level[4])
+ind5<-which(label==level[5])
+ind6<-which(label==level[6])
+ind7<-which(label==level[7])
+CON<-Species[,ind1] 
+A_MAP<-Species[,ind2]
+R_MAP<-Species[,ind3]
+A_MSAP<-Species[,ind4]
+R_MSAP<-Species[,ind5]
+A_SAP<-Species[,ind6]
+R_SAP<-Species[,ind7]
+CON=t(CON)
+A_MAP=t(A_MAP)
+R_MAP=t(R_MAP)
+A_MSAP=t(A_MSAP)
+R_MSAP=t(R_MSAP)
+A_SAP=t(A_SAP)
+R_SAP=t(R_SAP)
+sp1 <- specaccum(CON, method = 'random')
+sp2 <- specaccum(A_MAP, method = 'random')
+sp3 <- specaccum(R_MAP, method = 'random')
+sp4 <- specaccum(A_MSAP, method = 'random')
+sp5 <- specaccum(R_MSAP, method = 'random')
+sp6 <- specaccum(A_SAP, method = 'random')
+sp7 <- specaccum(R_SAP, method = 'random')
+plot(sp1, xlab="Sample",ylab="Species", col = 'white', lwd = 0, ci.lty = 0)
+boxplot(sp1, col = 'blue', add = TRUE, pch = '+')
+boxplot(sp2, col = 'red', add = TRUE, pch = '+')
+boxplot(sp3, col = 'yellow', add = TRUE, pch = '+')
+boxplot(sp4, col = 'red', add = TRUE, pch = '+')
+boxplot(sp5, col = 'red', add = TRUE, pch = '+')
+boxplot(sp6, col = 'red', add = TRUE, pch = '+')
+boxplot(sp7, col = 'red', add = TRUE, pch = '+')
+legend(x=11.5,y=1000,level[1],pch=20,col="blue",bty="n",cex=1.2)
+legend(x=11.5,y=500,level[2],pch=20,col="red",bty="n",cex=1.2)
+
+
+Species <- read.table('MGS.txt', header=T,row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+label<-factor(c(rep(0,4),rep(1,4),rep(2,4),rep(1,5),rep(2,5),rep(1,4),rep(2,4)),levels=c("0","1","2"),labels=c("CON","A","R"))
+names(label)<-colnames(Species)
+level<-levels(label)
+ind1<-which(label==level[1])
+ind2<-which(label==level[2])
+ind3<-which(label==level[3])
+CON<-Species[,ind1] 
+A<-Species[,ind2]
+R<-Species[,ind3]
+CON=t(CON)
+A=t(A)
+R=t(R)
+sp1 <- specaccum(CON, method = 'random')
+sp2 <- specaccum(A, method = 'random')
+sp3 <- specaccum(R, method = 'random')
+plot(sp2, xlab="Sample",ylab="Species", col = 'white', lwd = 0, ci.lty = 0)
+boxplot(sp1, col = 'blue', add = TRUE, pch = '+')
+boxplot(sp2, col = 'red', add = TRUE, pch = '+')
+boxplot(sp3, col = 'yellow', add = TRUE, pch = '+')
+legend(x=11,y=1500,level[1],pch=20,col="blue",bty="n",cex=1.2)
+legend(x=11,y=1000,level[2],pch=20,col="red",bty="n",cex=1.2)
+legend(x=11,y=500,level[3],pch=20,col="YELLOW",bty="n",cex=1.2)
+
+##############shannon  index= ====================================================
+library(reshape2)
+Species=t(Species)
+Species<-data.frame(Species)
+Shannon <-diversity(Species, index = "shannon")
+Shannon<-data.frame(Shannon)
+write.csv(Shannon,"Shannon.csv")
+#Simpson
+Simpson <- diversity(herb, index = "simpson")
+#Inverse Simpson
+Inverse.Simpson <- diversity(herb, index = "inv")
+
+library(ggplot2)
+library(forcats)
+library(ggpubr)
+library(magrittr)
+library(ggsignif)
+Shannon <- read.table('Shannon.txt', header=T,row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+Shannon$group3 <- factor(Shannon$group3,levels = c("CON","A_MAP","R_MAP","A_MSAP","R_MSAP","A_SAP","R_SAP"))
+my_comparisons = list(c("A_MAP","R_MAP"),c("A_MSAP","R_MSAP"),c("A_SAP","R_SAP"),c("CON","A_MAP"),c("CON","A_MSAP"),c("CON","A_SAP"),c("CON","R_MAP"),c("CON","R_MSAP"),c("CON","R_SAP"))
+p <- ggplot(Shannon , aes(x = group3, y = Shannon)) +
+  geom_boxplot(aes(fill = group3), show.legend = FALSE, width = 0.6) + 
+  #scale_fill_manual(values = c('blue', 'red')) + 
+  geom_point(size = 2) + 
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) + 
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'Shannon ', title = 'Shannon indexs')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+ 
+
+my_comparisons = list(c("CON","A_MAP"),c("CON","A_MSAP"),c("CON","R_MAP"),c("CON","R_MSAP"))
+p <- ggplot(Shannon , aes(x = group3, y = Shannon)) +
+  geom_boxplot(aes(fill = group3), show.legend = FALSE, width = 0.6) +  
+  #scale_fill_manual(values = c('blue', 'red')) +
+  geom_point(size = 2) + 
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) + 
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'Shannon ', title = 'Shannon indexs')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+
+
+Shannon$group1 <- factor(Shannon$group1,levels = c("CON","A","R"))
+my_comparisons = list(c("A","R"),c("CON","A"),c("CON","R"))
+p <- ggplot(Shannon , aes(x = group1, y = Shannon)) +
+  geom_boxplot(aes(fill = group1), show.legend = FALSE, width = 0.6) +  
+  #scale_fill_manual(values = c('blue', 'red')) +  
+  geom_point(size = 2) +  
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) + 
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'Shannon ', title = 'Shannon indexs')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+
+my_comparisons = list(c("CON","A"),c("CON","R"))
+p <- ggplot(Shannon , aes(x = group1, y = Shannon)) +
+  geom_boxplot(aes(fill = group1), show.legend = FALSE, width = 0.6) + 
+  #scale_fill_manual(values = c('blue', 'red')) + 
+  geom_point(size = 2) + 
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) + 
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'Shannon ', title = 'Shannon indexs')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+
+
+library(ggplot2)
+library(forcats)
+library(ggpubr)
+library(magrittr)
+library(ggsignif)
+Shannon <- read.table('COG_Category.txt', header=T,row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+Shannon$group3 <- factor(Shannon$group3,levels = c("CON","A_MAP","R_MAP","A_MSAP","R_MSAP","A_SAP","R_SAP"))
+my_comparisons = list(c("A_MAP","R_MAP"),c("A_MSAP","R_MSAP"),c("A_SAP","R_SAP"),c("CON","A_MAP"),c("CON","A_MSAP"),c("CON","A_SAP"),c("CON","R_MAP"),c("CON","R_MSAP"),c("CON","R_SAP"))
+p <- ggplot(Shannon , aes(x = group3, y = POORLY_CHARACTERIZED)) +
+  geom_boxplot(aes(fill = group3), show.legend = FALSE, width = 0.6) +  
+  #scale_fill_manual(values = c('blue', 'red')) +  
+  geom_point(size = 2) + 
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) +  
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'POORLY CHARACTERIZED ', title = 'POORLY CHARACTERIZED')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+stat_compare_means(aes(group=group3),label.x=1.5,label = "p.format",hide.ns =F,method = "wilcox.test",paired = TRUE)
+p
+
+
+Shannon$group1 <- factor(Shannon$group1,levels = c("CON","A","R"))
+my_comparisons = list(c("A","R"),c("CON","A"),c("CON","R"))
+p <- ggplot(Shannon , aes(x = group1, y = POORLY_CHARACTERIZED)) +
+  geom_boxplot(aes(fill = group1), show.legend = FALSE, width = 0.6) + 
+  #scale_fill_manual(values = c('blue', 'red')) +
+  geom_point(size = 2) + 
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) +  
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'POORLY CHARACTERIZED ', title = 'POORLY CHARACTERIZED')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+
+
+library(ggplot2)
+library(forcats)
+library(ggpubr)
+library(magrittr)
+library(ggsignif)
+Shannon <- read.table('COG_Category.txt', header=T,row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+Shannon$group3 <- factor(Shannon$group3,levels = c("CON","A_MAP","R_MAP","A_MSAP","R_MSAP","A_SAP","R_SAP"))
+my_comparisons = list(c("A_MAP","R_MAP"),c("A_MSAP","R_MSAP"),c("A_SAP","R_SAP"),c("CON","A_MAP"),c("CON","A_MSAP"),c("CON","A_SAP"),c("CON","R_MAP"),c("CON","R_MSAP"),c("CON","R_SAP"))
+p <- ggplot(Shannon , aes(x = group3, y = POORLY_CHARACTERIZED)) +
+  geom_boxplot(aes(fill = group3), show.legend = FALSE, width = 0.6) + 
+  #scale_fill_manual(values = c('blue', 'red')) + 
+  geom_point(size = 2) + 
+  #geom_line(aes(group = group2), color = 'gray', lwd = 0.5) +  
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'POORLY CHARACTERIZED ', title = 'POORLY CHARACTERIZED')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+stat_compare_means(aes(group=group3),label.x=1.5,label = "p.format",hide.ns =F,method = "wilcox.test",paired = F)
+p
+
+
+Shannon$group1 <- factor(Shannon$group1,levels = c("CON","A","R"))
+my_comparisons = list(c("A","R"),c("CON","A"),c("CON","R"))
+p <- ggplot(Shannon , aes(x = group1, y = POORLY_CHARACTERIZED)) +
+  geom_boxplot(aes(fill = group1), show.legend = FALSE, width = 0.6) +  
+  #scale_fill_manual(values = c('blue', 'red')) +  
+  geom_point(size = 2) + 
+  geom_line(aes(group = group2), color = 'gray', lwd = 0.5) +  
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = 'black', size = 1), panel.background = element_blank(), 
+        plot.title = element_text(size = 20, hjust = 0.5), plot.subtitle = element_text(size = 15, hjust = 0.5), 
+        axis.text = element_text(size = 20, color = 'black'), axis.title = element_text(size = 20, color = 'black')) +
+  labs(x = '', y = 'POORLY CHARACTERIZED ', title = 'POORLY CHARACTERIZED')+
+  stat_compare_means(comparisons = my_comparisons,label = "p.signif",hide.ns =F,method = "wilcox.test")
+p
+ 
+
+rows<-read.table("species.txt",sep = "\t",header = T,row.names = 1)
+cols <-read.table("pathway.txt",sep = "\t",header = T,row.names = 1)
+library(psych)
+data.corr <- corr.test(rows, cols, method="pearson", adjust="fdr")
+data.r <- data.corr$r 
+data.p <- data.corr$p # p
+
+
+library(pheatmap)
+getSig <- function(dc) {
+  sc <- ''
+  if (dc < 0.001) sc <- '***'
+  else if (dc < 0.01) sc <- '**'
+  else if (dc < 0.05) sc <- '*'
+  sc
+}
+sig.mat <- matrix(sapply(data.p, getSig), nrow=nrow(data.p))
+pheatmap(data.r, clustering_method="average", cluster_rows=T, cluster_cols=F,angle_col = c( "45"), display_numbers=sig.mat, filename = "cor.pdf", width = 8, height = 12)
+
+
+
+
+
